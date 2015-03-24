@@ -1,14 +1,15 @@
 
 angular.module("fuelux.wizard", [])
-.directive('wizard', ['$compile', function($compile){
-  return {
+.directive('wizard', ['$compile', '$parse', function($compile, $parse){
+  return {terminal: true, priority:1000,
     restrict: 'A',
-    scope: {change: '&',    changed: '&', wizard:'='},
+    scope: true,//{change: '&',    changed: '&', wizard:'='},
     link: function(scope, ele, attrs){
         ele.removeAttr("wizard");
         var steps = ele.find(".wizard > .steps > li"), stepContents = ele.find(".step-content > .step-pane"), stepEle;
-        scope.currentStepIndex = (+ attrs.wizard)>0?(+ attrs.wizard):0;
 
+		scope.currentStepIndex = (+ scope.$eval(attrs.wizard));
+        scope.currentStepIndex = scope.currentStepIndex>0?scope.currentStepIndex:0;
         for(var step=0; step < steps.length; step++){//register steps
             scope.steps.push({currentStep:false});
             stepEle = angular.element(steps[step]).attr('ng-class', '{active:steps['+step+'].currentStep, complete:'+step+'<currentStepIndex}');
@@ -17,14 +18,16 @@ angular.module("fuelux.wizard", [])
 
             angular.element(stepContents[step]).attr('ng-class', '{active:steps['+step+'].currentStep}');
         }
-	ele.find('button.btn-prev').attr('ng-click','showPreviousStep()').attr('ng-disabled', '!hasPrevious()');
-	ele.find('button.btn-next').attr('ng-click','showNextStep()').attr('ng-disabled', '!hasNext()');
+		ele.find('button.btn-prev').attr('ng-click','showPreviousStep()').attr('ng-disabled', '!hasPrevious()');
+		ele.find('button.btn-next').attr('ng-click','showNextStep()').attr('ng-disabled', '!hasNext()');
         
         scope.steps[scope.currentStepIndex].currentStep = true;
         $compile(ele)(scope);
 
-        scope.$watch('wizard', function(stepValue) {
-            if (stepValue!=scope.currentStepIndex) {
+        scope.change = $parse(attrs.change);
+        scope.changed = $parse(attrs.changed);
+        scope.$watch(attrs.wizard, function(stepValue) {
+			if (stepValue!=scope.currentStepIndex) {
                 scope.toggleSteps(stepValue);
             }
         });
@@ -37,17 +40,16 @@ angular.module("fuelux.wizard", [])
         $scope.toggleSteps = function(showIndex, direction){
             var event = {event: {fromStep: $scope.currentStepIndex, toStep: showIndex}};
             if(direction===true||direction===false){
-                event.direction = (direction===true?'next':'prev');
-                if($scope.change && $scope.change(event)) return;
+                event.event.direction = (direction===true?'next':'prev');
+                if($scope.change && $scope.change($scope, event)) return;
             }
 
             $scope.steps[$scope.currentStepIndex].currentStep = false;
             $scope.currentStepIndex = showIndex;
-            $scope.wizard = showIndex;
 
             $scope.steps[$scope.currentStepIndex].currentStep = true;
             if($scope.changed){
-                $scope.changed(event);
+                $scope.changed($scope, event);
             }
         }
         $scope.stepClicked = function($index){ if($index<$scope.currentStepIndex) $scope.toggleSteps($index);}
