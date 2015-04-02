@@ -8,7 +8,8 @@ angular.module("fuelux.wizard", [])
         ele.removeAttr("wizard");
         var steps = ele.find(".wizard > .steps > li"), stepContents = ele.find(".step-content > .step-pane"), stepEle;
 
-		scope.currentStepIndex = (+ scope.$eval(attrs.wizard));
+	scope.attrWiz = attrs.wizard;
+	scope.currentStepIndex = (+ scope.$eval(scope.attrWiz));
         scope.currentStepIndex = scope.currentStepIndex>0?scope.currentStepIndex:0;
         for(var step=0; step < steps.length; step++){//register steps
             scope.steps.push({currentStep:false});
@@ -46,7 +47,8 @@ angular.module("fuelux.wizard", [])
 
             $scope.steps[$scope.currentStepIndex].currentStep = false;
             $scope.currentStepIndex = showIndex;
-
+	    $scope.$parent.$eval($scope.attrWiz+' = '+showIndex);
+	    
             $scope.steps[$scope.currentStepIndex].currentStep = true;
             if($scope.changed){
                 $scope.changed($scope, event);
