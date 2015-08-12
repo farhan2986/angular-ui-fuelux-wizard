@@ -1,0 +1,26 @@
+{
+  "name": "angular-ui-fuelux-wizard",
+  "version": "1.0.0",
+  "homepage": "https://github.com/farhan2986/angular-ui-fuelux-wizard",
+  "authors": [
+    "farhan2986"
+  ],
+  "description": "angular directive for fuelux-wizard",
+  "main": "wizard.js",
+  "moduleType": [
+    "node"
+  ],
+  "keywords": [
+    "fuelux-wizard",
+    "angular",
+    "customizable"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
